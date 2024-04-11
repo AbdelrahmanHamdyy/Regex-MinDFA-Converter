@@ -56,7 +56,7 @@ class NFA:
                 accept = State(f'S{i + 1}', StateType.ACCEPT)
                 start.add_transition('', nfa.start)
                 start.add_transition('', accept)
-                nfa.accept.add_transition('', nfa.start)
+                nfa.accept.add_transition('', start)
                 nfa.accept.add_transition('', accept)
                 stack.append(NFA(start, accept))
             elif token == '+':
@@ -119,7 +119,7 @@ class NFA:
             for symbol, transition in state.transitions:
                 if symbol == '':
                     symbol = 'ε'
-                result[state.name][symbol] = transition.name if symbol not in result[state.name] else result[state.name][symbol] + ', ' + transition.name
+                result[state.name][symbol] = transition.name if symbol not in result[state.name] else result[state.name][symbol] + ',' + transition.name
         return result
     
     def visualize(self):
