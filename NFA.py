@@ -1,26 +1,15 @@
 from enum import Enum
 import json
 
-class StateType(Enum):
-    START = 1
-    ACCEPT = 2
-
 class State:
-    def __init__(self, name, type: StateType):
+    def __init__(self, name):
         self.name = name
-        self.type = type
         self.is_terminating = True
         self.transitions = []
 
     def add_transition(self, symbol, state):
         self.transitions.append((symbol, state))
         self.is_terminating = False
-
-    def get_transitions(self, symbol):
-        if symbol in self.transitions:
-            return self.transitions[symbol]
-        else:
-            return set()
 
 class NFA:
     def __init__(self, start: State, accept: State):
@@ -37,23 +26,22 @@ class NFA:
             if token == '.':
                 nfa2 = stack.pop()
                 nfa1 = stack.pop()
-                nfa1.accept.type = StateType.START
                 nfa1.accept.add_transition('', nfa2.start)
                 stack.append(NFA(nfa1.start, nfa2.accept))
             elif token == '|':
                 nfa2 = stack.pop()
                 nfa1 = stack.pop()
-                start = State(f'S{i}', StateType.START)
+                start = State(f'S{i}')
                 start.add_transition('', nfa1.start)
                 start.add_transition('', nfa2.start)
-                accept = State(f'S{i + 1}', StateType.ACCEPT)
+                accept = State(f'S{i + 1}')
                 nfa1.accept.add_transition('', accept)
                 nfa2.accept.add_transition('', accept)
                 stack.append(NFA(start, accept))
             elif token == '*':
                 nfa = stack.pop()
-                start = State(f'S{i}', StateType.START)
-                accept = State(f'S{i + 1}', StateType.ACCEPT)
+                start = State(f'S{i}')
+                accept = State(f'S{i + 1}')
                 start.add_transition('', nfa.start)
                 start.add_transition('', accept)
                 nfa.accept.add_transition('', start)
@@ -61,23 +49,23 @@ class NFA:
                 stack.append(NFA(start, accept))
             elif token == '+':
                 nfa = stack.pop()
-                start = State(f'S{i}', StateType.START)
-                accept = State(f'S{i + 1}', StateType.ACCEPT)
+                start = State(f'S{i}')
+                accept = State(f'S{i + 1}')
                 start.add_transition('', nfa.start)
                 nfa.accept.add_transition('', start)
                 nfa.accept.add_transition('', accept)
                 stack.append(NFA(start, accept))
             elif token == '?':
                 nfa = stack.pop()
-                start = State(f'S{i}', StateType.START)
-                accept = State(f'S{i + 1}', StateType.ACCEPT)
+                start = State(f'S{i}')
+                accept = State(f'S{i + 1}')
                 start.add_transition('', nfa.start)
                 start.add_transition('', accept)
                 nfa.accept.add_transition('', accept)
                 stack.append(NFA(start, accept))
             else:
-                start = State(f'S{i}', StateType.START)
-                accept = State(f'S{i + 1}', StateType.ACCEPT)
+                start = State(f'S{i}')
+                accept = State(f'S{i + 1}')
                 start.add_transition(token, accept)
                 stack.append(NFA(start, accept))
         
@@ -89,6 +77,7 @@ class NFA:
         nfa = self.build_nfa(postix)
         self.start = nfa.start
         self.accept = nfa.accept
+        
         # Get states
         visited = set()
         states = []
