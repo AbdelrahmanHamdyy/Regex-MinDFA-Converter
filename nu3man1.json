@@ -54,7 +54,7 @@
   },
   "N": {
     "isTerminatingState": false,
-    "epsilon": "F"
+    "epsilon": "P"
   },
   "O": {
     "isTerminatingState": false,
@@ -82,7 +82,7 @@
   },
   "U": {
     "isTerminatingState": false,
-    "epsilon": "U"
+    "epsilon": "V"
   },
   "V": {
     "isTerminatingState": true
