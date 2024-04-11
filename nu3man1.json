@@ -1,0 +1,90 @@
+{
+  "startingState": "A",
+  "A": {
+    "isTerminatingState": false,
+    "epsilon": "B,H"
+  },
+  "B": {
+    "isTerminatingState": false,
+    "epsilon": "C,D"
+  },
+  "C": {
+    "isTerminatingState": false,
+    "a": "E"
+  },
+  "D": {
+    "isTerminatingState": false,
+    "b": "F"
+  },
+  "E": {
+    "isTerminatingState": false,
+    "epsilon": "G"
+  },
+  "F": {
+    "isTerminatingState": false,
+    "epsilon": "G"
+  },
+  "G": {
+    "isTerminatingState": false,
+    "epsilon": "H"
+  },
+  "H": {
+    "isTerminatingState": false,
+    "epsilon": "A,I"
+  },
+  "I": {
+    "isTerminatingState": false,
+    "a": "J"
+  },
+  "J": {
+    "isTerminatingState": false,
+    "epsilon": "K"
+  },
+  "K": {
+    "isTerminatingState": false,
+    "epsilon": "L,M"
+  },
+  "L": {
+    "isTerminatingState": false,
+    "a": "N"
+  },
+  "M": {
+    "isTerminatingState": false,
+    "b": "O"
+  },
+  "N": {
+    "isTerminatingState": false,
+    "epsilon": "F"
+  },
+  "O": {
+    "isTerminatingState": false,
+    "epsilon": "P"
+  },
+  "P": {
+    "isTerminatingState": false,
+    "epsilon": "Q"
+  },
+  "Q": {
+    "isTerminatingState": false,
+    "epsilon": "R,S"
+  },
+  "R": {
+    "isTerminatingState": false,
+    "a": "T"
+  },
+  "S": {
+    "isTerminatingState": false,
+    "b": "U"
+  },
+  "T": {
+    "isTerminatingState": false,
+    "epsilon": "V"
+  },
+  "U": {
+    "isTerminatingState": false,
+    "epsilon": "U"
+  },
+  "V": {
+    "isTerminatingState": true
+  }
+}
