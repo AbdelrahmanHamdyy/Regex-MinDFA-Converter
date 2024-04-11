@@ -6,10 +6,11 @@ class RegexToPostfix:
         self.valid = self.validate_regex()
         self.operator_precedence = {'*': 5, '+': 4, '?': 3, '.': 2, '|': 1}
         self.postfix = self.infix_to_postfix()
+        print(self)
         
     def validate_regex(self):
         try:
-            re.compile(regex)
+            re.compile(self.regex)
         except re.error:
             return False
         return True
@@ -66,7 +67,7 @@ class RegexToPostfix:
         '''
         result = ''
         for i in range(len(regex)):
-            if (i > 0 and (regex[i].isalnum() or regex[i] == '(') and (regex[i - 1].isalnum() or regex[i - 1] == ')')) or (regex[i] not in '*+.|' and regex[i - 1] in '*+)'):
+            if i > 0 and (((regex[i].isalnum() or regex[i] == '(') and (regex[i - 1].isalnum() or regex[i - 1] == ')')) or (regex[i] not in '*+.|' and regex[i - 1] in '*+)')):
                 result += '.'
             result += regex[i]
         return result
@@ -124,5 +125,4 @@ class RegexToPostfix:
     
 if __name__ == '__main__':
     regex = '[abc][a-z]ab*c'
-    regex_to_postfix = RegexToPostfix(regex)
-    print(regex_to_postfix)
+    R2P = RegexToPostfix(regex)
