@@ -6,7 +6,6 @@ class RegexToPostfix:
         self.valid = self.validate_regex()
         self.operator_precedence = {'*': 5, '+': 4, '?': 3, '.': 2, '|': 1}
         self.postfix = self.infix_to_postfix()
-        print(self)
         
     def validate_regex(self):
         try:
@@ -126,3 +125,4 @@ class RegexToPostfix:
 if __name__ == '__main__':
     regex = '[abc][a-z]ab*c'
     R2P = RegexToPostfix(regex)
+    print(R2P)

@@ -64,7 +64,7 @@ class NFA:
                 start = State(f'S{i}', StateType.START)
                 accept = State(f'S{i + 1}', StateType.ACCEPT)
                 start.add_transition('', nfa.start)
-                nfa.accept.add_transition('', nfa.start)
+                nfa.accept.add_transition('', start)
                 nfa.accept.add_transition('', accept)
                 stack.append(NFA(start, accept))
             elif token == '?':
