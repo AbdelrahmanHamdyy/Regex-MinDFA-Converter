@@ -18,7 +18,7 @@ def getAllNeededStates(data,startingState,incomingLetter):
             returnedSet.add(value)  # Add the string value
         result |= returnedSet  # Perform set union
     
-    return result
+    return sorted(result)
 #---------------------------------------------------------------------------------------------------------------------------
 def getEpsilons(data,startingState,lettersSet):
     resultState=lettersSet
@@ -51,20 +51,17 @@ charsOfInterest ={}
 for char in regexChars:
     charsOfInterest[char]=[]
 
-charValues ={}
-
 #Dlw2te geh el dor eny amla b2a el states el muhema bensbali
 # hamla b2a 7arf 7arf mn l regex chars ely 3andy
 
+charValues ={}
 for char in regexChars:
     for key,value in data.items():
         if char in value:
             charsOfInterest[char].append(key)
-            #charValues[key] = getAllNeededStates()
+            charValues[key] = getAllNeededStates(data,key,char)
 
-#Dlw2te ana m3aya kul el 7ruf el muhema bensbali w ely menha ana ha3ml generation ll new states wl new states htb2a b esmhum w best5damha ha2dr a2ul heya el state de gdeda wala la
 
-#FirstLoop we will start from start Node
-print(getAllNeededStates(data,'L','a'))
+
 
 
