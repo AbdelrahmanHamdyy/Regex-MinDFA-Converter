@@ -73,8 +73,8 @@ class NFA:
             
         return stack.pop()
     
-    def execute(self, postix):
-        nfa = self.build_nfa(postix)
+    def execute(self, postfix):
+        nfa = self.build_nfa(postfix)
         self.start = nfa.start
         self.accept = nfa.accept
         
@@ -113,6 +113,12 @@ class NFA:
     
     def visualize(self):
         pass
+    
+def get_main_chars(regex):
+    chars_of_interest = set()
+    for token in regex:
+        chars_of_interest.add(token)
+    return chars_of_interest
     
 if __name__ == '__main__':
     nfa = NFA(None, None)
