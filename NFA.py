@@ -43,11 +43,19 @@ class NFA:
         i = 0
         for token in self.postfix:
             if token == '.': # Concatenation operator
+                '''
+                - Pop two NFAs from the stack, connect the accept state of the first NFA to the start state of the second NFA which accounts for the concatenation of the two NFAs
+                - Push the new NFA back to the stack
+                '''
                 nfa2 = stack.pop()
                 nfa1 = stack.pop()
                 nfa1.accept.add_transition('ε', nfa2.start)
                 stack.append(NFA(nfa1.start, nfa2.accept))
             elif token == '|': # OR operator
+                '''
+                - Pop two NFAs from the stack, create a new start state and connect it to the start states of the two NFAs, this new start state represents the option of choosing either of the two NFAs
+                - Connect the accept states of the two NFAs to a new accept state and push the new NFA back to the stack
+                '''
                 nfa2 = stack.pop()
                 nfa1 = stack.pop()
                 start = State(f'S{i}')
@@ -58,6 +66,11 @@ class NFA:
                 nfa2.accept.add_transition('ε', accept)
                 stack.append(NFA(start, accept))
             elif token == '*': # Kleene star operator
+                '''
+                - Pop an NFA from the stack, create a new start state and a new accept state
+                - Connect the new start state to the start state of the NFA and to the new accept state which represents the option of not consuming the NFA at all
+                - Connect the accept state of the NFA to the start state of the NFA for looping and to the new accept state for exiting the loop
+                '''
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
@@ -67,6 +80,11 @@ class NFA:
                 nfa.accept.add_transition('ε', accept)
                 stack.append(NFA(start, accept))
             elif token == '+': # One or more operator
+                '''
+                - Pop an NFA from the stack, create a new start state and a new accept state
+                - Connect the new start state to the start state of the NFA which means the NFA must be consumed at least once
+                - Connect the accept state of the NFA to the start state of the NFA for looping and to the new accept state for ending it
+                '''
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
@@ -75,6 +93,11 @@ class NFA:
                 nfa.accept.add_transition('ε', accept)
                 stack.append(NFA(start, accept))
             elif token == '?': # Zero or one operator
+                '''
+                - Pop an NFA from the stack, create a new start state and a new accept state
+                - Connect the new start state to the start state of the NFA and to the new accept state which means the NFA can be consumed or not
+                - Connect the accept state of the NFA to the new accept state
+                '''
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
@@ -83,6 +106,9 @@ class NFA:
                 nfa.accept.add_transition('ε', accept)
                 stack.append(NFA(start, accept))
             else: # Operand
+                '''
+                - Simply create a new NFA with a start state and an accept state and connect them with the token
+                '''
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
                 start.add_transition(token, accept)
