@@ -1,0 +1,41 @@
+{
+  "S0": { "value": "ABCDHI", "isTerminalState": false, "a": "S1", "b": "S2" },
+  "S1": {
+    "value": "ABCDEGHIJKLM",
+    "isTerminalState": false,
+    "a": "S3",
+    "b": "S4"
+  },
+  "S2": { "value": "ABCDFGHI", "isTerminalState": false, "a": "S1", "b": "S2" },
+  "S3": {
+    "value": "ABCDEGHIJKLMNPQRS",
+    "isTerminalState": false,
+    "a": "S5",
+    "b": "S6"
+  },
+  "S4": {
+    "value": "ABCDFGHIOPQRS",
+    "isTerminalState": false,
+    "a": "S7",
+    "b": "S8"
+  },
+  "S5": {
+    "value": "ABCDEGHIJKLMNPQRSTV",
+    "isTerminalState": true,
+    "a": "S5",
+    "b": "S6"
+  },
+  "S6": {
+    "value": "ABCDFGHIOPQRSUV",
+    "isTerminalState": true,
+    "a": "S7",
+    "b": "S8"
+  },
+  "S7": {
+    "value": "ABCDEGHIJKLMTV",
+    "isTerminalState": true,
+    "a": "S3",
+    "b": "S4"
+  },
+  "S8": { "value": "ABCDFGHIUV", "isTerminalState": true, "a": "S1", "b": "S2" }
+}
