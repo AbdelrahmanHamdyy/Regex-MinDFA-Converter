@@ -4,32 +4,50 @@ import graphviz
 
 class State:
     def __init__(self, name):
+        # State label
         self.name = name
+        # Flag to indicate if the state is a terminating state
         self.is_terminating = True
+        # Initialize transitions to an empty dictionary of lists
         self.transitions = defaultdict(list)
 
     def add_transition(self, symbol, state):
+        '''
+        Add a transition from the current state to the next state
+        '''
+        # Add the next state to the list of states reachable by the given symbol
         self.transitions[symbol].append(state)
+        # If a transition is added, we now know that the current state is not a terminating state
         self.is_terminating = False
 
+'''
+Reference: https://medium.com/swlh/visualizing-thompsons-construction-algorithm-for-nfas-step-by-step-f92ef378581b
+'''
+
 class NFA:
-    def __init__(self, start: State = None, accept: State = None):
+    def __init__(self, start: State = None, accept: State = None, postfix: str = None):
+        # Starting state of the NFA
         self.start = start
+        # Accepting state of the NFA
         self.accept = accept
+        # Postfix expression
+        self.postfix = postfix
         
-    def build_nfa(self, postfix):
+    def build_nfa(self):
         '''
         Thomspon's construction algorithm
         '''
+        # Initialize an empty stack to store NFAs during construction
         stack = []
+        # Counter to keep track of the state names
         i = 0
-        for token in postfix:
-            if token == '.':
+        for token in self.postfix:
+            if token == '.': # Concatenation operator
                 nfa2 = stack.pop()
                 nfa1 = stack.pop()
                 nfa1.accept.add_transition('ε', nfa2.start)
                 stack.append(NFA(nfa1.start, nfa2.accept))
-            elif token == '|':
+            elif token == '|': # OR operator
                 nfa2 = stack.pop()
                 nfa1 = stack.pop()
                 start = State(f'S{i}')
@@ -39,7 +57,7 @@ class NFA:
                 nfa1.accept.add_transition('ε', accept)
                 nfa2.accept.add_transition('ε', accept)
                 stack.append(NFA(start, accept))
-            elif token == '*':
+            elif token == '*': # Kleene star operator
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
@@ -48,7 +66,7 @@ class NFA:
                 nfa.accept.add_transition('ε', start)
                 nfa.accept.add_transition('ε', accept)
                 stack.append(NFA(start, accept))
-            elif token == '+':
+            elif token == '+': # One or more operator
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
@@ -56,7 +74,7 @@ class NFA:
                 nfa.accept.add_transition('ε', start)
                 nfa.accept.add_transition('ε', accept)
                 stack.append(NFA(start, accept))
-            elif token == '?':
+            elif token == '?': # Zero or one operator
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
@@ -64,37 +82,45 @@ class NFA:
                 start.add_transition('ε', accept)
                 nfa.accept.add_transition('ε', accept)
                 stack.append(NFA(start, accept))
-            else:
+            else: # Operand
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
                 start.add_transition(token, accept)
                 stack.append(NFA(start, accept))
         
+            # Increment the counter by 2 if the token is not a concatenation operator since it doesn't consume a state name
             i += 2 if token != '.' else 0
             
         return stack.pop()
     
-    def execute(self, postfix):
-        nfa = self.build_nfa(postfix)
+    def gather_states(self, nfa, visited, states):
+        '''
+        Gather all states reachable from the starting state
+        '''
+        # Add the current state to the list of visited states
+        visited.add(nfa.start)
+        states.append(nfa.start)
+        # Iterate over the transitions from the current state
+        for _, next_states in nfa.start.transitions.items():
+            for state in next_states:
+                # If the next state has not been visited, recursively gather states from that state
+                if state not in visited:
+                    self.gather_states(NFA(start=state), visited, states)
+    
+    def execute(self):
+        # Build the NFA and set the starting and accepting states of the final NFA
+        nfa = self.build_nfa()
         self.start = nfa.start
         self.accept = nfa.accept
         
-        # Get states
-        visited = set()
+        # Get all states reachable from the starting state
         states = []
-        queue = [self.start]
-        visited.add(self.start)
-        while queue:
-            state = queue.pop(0)
-            states.append(state)
-            for _, next_states in state.transitions.items():
-                for transition in next_states:
-                    if transition not in visited:
-                        visited.add(transition)
-                        queue.append(transition)
+        visited = set()
+        self.gather_states(nfa, visited, states)
         
+        # Get the JSON representation of the NFA
         result = self.get_json(states)
-        # Dump to JSON
+        # Dump to JSON file
         with open('nfa.json', 'w') as f:
             json.dump(result, f, indent=4)
             
@@ -105,17 +131,24 @@ class NFA:
         '''
         Convert the NFA to a JSON object
         '''
+        # Initialize the result dictionary with the starting state
         result = {'startingState': self.start.name}
+        # Loop through each state and add its transitions to the result dictionary
         for state in states:
+            # Initialize the state dictionary with the terminating state flag
             result[state.name] = {
                 'isTerminatingState': state.is_terminating,
             }
+            # Add the transitions to the state dictionary
             for symbol, next_states in state.transitions.items():
                 result[state.name].setdefault(symbol, []).extend([transition.name for transition in next_states])
         return result
     
     def visualize(self):
+        # Initialize the graph
         dot = graphviz.Digraph(comment='NFA Visualization')
+        
+        # Load the JSON representation of the NFA
         states_json = None
         with open('nfa.json', 'r') as f:
             states_json = json.load(f)
@@ -140,16 +173,21 @@ class NFA:
                 for next_state in next_states:
                         dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
 
+        # Save the graph to a file and optionally view it
         dot.render('nfa.gv', view=True)
     
 def get_main_chars(regex):
-    chars_of_interest = set()
+    '''
+    Get the main characters of interest in the regular expression that would form new states
+    '''
+    chars_of_interest = []
     for token in regex:
-        chars_of_interest.add(token)
+        if token not in chars_of_interest:
+            chars_of_interest.append(token)
     return chars_of_interest
     
 if __name__ == '__main__':
-    nfa = NFA()
-    nfa.execute('ab*|c.')
+    nfa = NFA(postfix='AB.AB|*.AB..')
+    nfa.execute()
     print("NFA generated successfully!")
     
