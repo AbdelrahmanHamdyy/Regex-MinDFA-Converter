@@ -66,7 +66,7 @@ class RegexToPostfix:
         '''
         result = ''
         for i in range(len(regex)):
-            if i > 0 and (((regex[i].isalnum() or regex[i] == '(') and (regex[i - 1].isalnum() or regex[i - 1] == ')')) or (regex[i] not in '*+.|' and regex[i - 1] in '*+)')):
+            if i > 0 and (((regex[i].isalnum() or regex[i] == '(') and (regex[i - 1].isalnum() or regex[i - 1] == ')')) or (regex[i] not in '*+.|)' and regex[i - 1] in '*+)')):
                 result += '.'
             result += regex[i]
         return result
