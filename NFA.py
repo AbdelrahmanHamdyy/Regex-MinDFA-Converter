@@ -179,16 +179,25 @@ class NFA:
         with open('nfa.json', 'r') as f:
             states_json = json.load(f)
 
-        # Handle starting state separately
-        starting_state_name = states_json.pop('startingState')
+        # Pop the starting state from the JSON object
+        start_state_name = states_json.pop('startingState')
+        
+        # Add a starting point to the graph
+        dot.node('', label='', shape='point')
+        
+        # Explicitly add the starting state to the graph
+        shape = 'doublecircle' if states_json[start_state_name]['isTerminatingState'] else 'circle'
+        dot.node(start_state_name, label=start_state_name, shape=shape)
+        
+        # Connect the starting point to the starting state
+        dot.edge('', start_state_name)
 
         # Add states to the graph
         for state_name, state_data in states_json.items():
+            if state_name == start_state_name:
+                continue
             shape = 'doublecircle' if state_data['isTerminatingState'] else 'circle'
             dot.node(state_name, label=state_name, shape=shape)
-
-        # Add starting state explicitly
-        dot.node(starting_state_name, label=starting_state_name, shape='circle')
 
         # Add transitions
         for state_name, transitions in states_json.items():
@@ -197,7 +206,7 @@ class NFA:
                 if symbol == 'isTerminatingState':
                     continue
                 for next_state in next_states:
-                        dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
+                    dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
 
         # Save the graph to a file and optionally view it
         dot.render('nfa.gv', view=True)
