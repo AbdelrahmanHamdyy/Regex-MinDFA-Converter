@@ -130,7 +130,7 @@ class DFA:
                 if symbol == 'isTerminatingState':
                     continue
                 dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
-        dot.render('dfa.gv', view=False)
+        dot.render('output/dfa.gv', view=False)
 
     def execute(self, output_path):
         terminal_states, target_chars, values_generated_from_taking_char = self.get_required_data(self.regex_chars)

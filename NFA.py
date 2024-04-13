@@ -133,7 +133,7 @@ class NFA:
                 if state not in visited:
                     self.gather_states(NFA(start=state), visited, states)
     
-    def execute(self, path='nfa.json'):
+    def execute(self, path='output/nfa.json'):
         # Build the NFA and set the starting and accepting states of the final NFA
         nfa = self.build_nfa()
         self.start = nfa.start
@@ -168,7 +168,7 @@ class NFA:
         return result
     
     @staticmethod
-    def visualize(path='nfa.json'):
+    def visualize(path='output/nfa.json'):
         # Initialize the graph
         dot = graphviz.Digraph(comment='NFA Visualization')
         
@@ -208,7 +208,7 @@ class NFA:
                     dot.edge(state_name, next_state, label=symbol)
 
         # Save the graph to a file and optionally view it
-        dot.render('nfa.gv', view=False)
+        dot.render('output/nfa.gv', view=False)
     
 def get_main_chars(regex):
     '''

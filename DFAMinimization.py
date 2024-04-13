@@ -140,7 +140,7 @@ class MinimizedDFA:
                 if symbol == 'isTerminatingState':
                     continue
                 dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
-        dot.render('min_dfa.gv', view=False)
+        dot.render('output/min_dfa.gv', view=True)
 
     def minimize(self):
         groups = self.initialize_groups()
@@ -149,9 +149,9 @@ class MinimizedDFA:
         print("Groups Splitted")
         new_states = self.merge_nodes(groups)
         finalized_states = self.rename_nodes(new_states)
-        self.write_data('minimized_DFA.json', finalized_states)
+        self.write_data('output/minimized_DFA.json', finalized_states)
 
 if __name__ == "__main__":
-    minDfa = MinimizedDFA('DFA.json',['a','b'])
+    minDfa = MinimizedDFA('output/dfa.json',['a','b'])
     minDfa.minimize()
-    MinimizedDFA.visualize('minimized_DFA.json')
+    MinimizedDFA.visualize('output/minimized_DFA.json')
