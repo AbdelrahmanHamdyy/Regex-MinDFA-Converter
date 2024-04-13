@@ -128,7 +128,7 @@ class MinimizedDFA:
                 if symbol == 'isTerminatingState':
                     continue
                 dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
-        dot.render('nfa.gv', view=True)
+        dot.render('min_dfa.gv', view=False)
 
     def minimize(self):
         groups = self.initialize_groups()

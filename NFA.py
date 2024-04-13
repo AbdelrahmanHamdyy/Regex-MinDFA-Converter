@@ -133,7 +133,7 @@ class NFA:
                 if state not in visited:
                     self.gather_states(NFA(start=state), visited, states)
     
-    def execute(self):
+    def execute(self, path):
         # Build the NFA and set the starting and accepting states of the final NFA
         nfa = self.build_nfa()
         self.start = nfa.start
@@ -147,11 +147,8 @@ class NFA:
         # Get the JSON representation of the NFA
         result = self.get_json(states)
         # Dump to JSON file
-        with open('nfa.json', 'w') as f:
+        with open(path, 'w') as f:
             json.dump(result, f, indent=4)
-            
-        # Visualize the NFA
-        self.visualize()
     
     def get_json(self, states):
         '''
@@ -165,18 +162,19 @@ class NFA:
             result[state.name] = {
                 'isTerminatingState': state.is_terminating,
             }
-            # Add the transitions to the state dictionary
+            # Add the transitions to the state dictionary as string separated by commas
             for symbol, next_states in state.transitions.items():
-                result[state.name].setdefault(symbol, []).extend([transition.name for transition in next_states])
+                result[state.name][symbol] = ','.join([next_state.name for next_state in next_states])
         return result
     
-    def visualize(self):
+    @staticmethod
+    def visualize(path):
         # Initialize the graph
         dot = graphviz.Digraph(comment='NFA Visualization')
         
         # Load the JSON representation of the NFA
         states_json = None
-        with open('nfa.json', 'r') as f:
+        with open(path, 'r') as f:
             states_json = json.load(f)
 
         # Pop the starting state from the JSON object
@@ -209,7 +207,7 @@ class NFA:
                     dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
 
         # Save the graph to a file and optionally view it
-        dot.render('nfa.gv', view=True)
+        dot.render('nfa.gv', view=False)
     
 def get_main_chars(regex):
     '''
@@ -217,12 +215,13 @@ def get_main_chars(regex):
     '''
     chars_of_interest = []
     for token in regex:
-        if token not in chars_of_interest:
+        if token not in chars_of_interest and token.isalnum():
             chars_of_interest.append(token)
     return chars_of_interest
     
 if __name__ == '__main__':
     nfa = NFA(postfix='AB.AB|*.AB..')
-    nfa.execute()
+    nfa.execute('nfa.json')
+    NFA.visualize('nfa.json')
     print("NFA generated successfully!")
     
