@@ -49,7 +49,7 @@ class NFA:
                 '''
                 nfa2 = stack.pop()
                 nfa1 = stack.pop()
-                nfa1.accept.add_transition('ε', nfa2.start)
+                nfa1.accept.add_transition('epsilon', nfa2.start)
                 stack.append(NFA(nfa1.start, nfa2.accept))
             elif token == '|': # OR operator
                 '''
@@ -59,11 +59,11 @@ class NFA:
                 nfa2 = stack.pop()
                 nfa1 = stack.pop()
                 start = State(f'S{i}')
-                start.add_transition('ε', nfa1.start)
-                start.add_transition('ε', nfa2.start)
+                start.add_transition('epsilon', nfa1.start)
+                start.add_transition('epsilon', nfa2.start)
                 accept = State(f'S{i + 1}')
-                nfa1.accept.add_transition('ε', accept)
-                nfa2.accept.add_transition('ε', accept)
+                nfa1.accept.add_transition('epsilon', accept)
+                nfa2.accept.add_transition('epsilon', accept)
                 stack.append(NFA(start, accept))
             elif token == '*': # Kleene star operator
                 '''
@@ -74,10 +74,10 @@ class NFA:
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
-                start.add_transition('ε', nfa.start)
-                start.add_transition('ε', accept)
-                nfa.accept.add_transition('ε', start)
-                nfa.accept.add_transition('ε', accept)
+                start.add_transition('epsilon', nfa.start)
+                start.add_transition('epsilon', accept)
+                nfa.accept.add_transition('epsilon', start)
+                nfa.accept.add_transition('epsilon', accept)
                 stack.append(NFA(start, accept))
             elif token == '+': # One or more operator
                 '''
@@ -88,9 +88,9 @@ class NFA:
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
-                start.add_transition('ε', nfa.start)
-                nfa.accept.add_transition('ε', start)
-                nfa.accept.add_transition('ε', accept)
+                start.add_transition('epsilon', nfa.start)
+                nfa.accept.add_transition('epsilon', start)
+                nfa.accept.add_transition('epsilon', accept)
                 stack.append(NFA(start, accept))
             elif token == '?': # Zero or one operator
                 '''
@@ -101,9 +101,9 @@ class NFA:
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
-                start.add_transition('ε', nfa.start)
-                start.add_transition('ε', accept)
-                nfa.accept.add_transition('ε', accept)
+                start.add_transition('epsilon', nfa.start)
+                start.add_transition('epsilon', accept)
+                nfa.accept.add_transition('epsilon', accept)
                 stack.append(NFA(start, accept))
             else: # Operand
                 '''
@@ -133,7 +133,7 @@ class NFA:
                 if state not in visited:
                     self.gather_states(NFA(start=state), visited, states)
     
-    def execute(self):
+    def execute(self, path='nfa.json'):
         # Build the NFA and set the starting and accepting states of the final NFA
         nfa = self.build_nfa()
         self.start = nfa.start
@@ -147,11 +147,8 @@ class NFA:
         # Get the JSON representation of the NFA
         result = self.get_json(states)
         # Dump to JSON file
-        with open('nfa.json', 'w') as f:
+        with open(path, 'w') as f:
             json.dump(result, f, indent=4)
-            
-        # Visualize the NFA
-        self.visualize()
     
     def get_json(self, states):
         '''
@@ -165,18 +162,19 @@ class NFA:
             result[state.name] = {
                 'isTerminatingState': state.is_terminating,
             }
-            # Add the transitions to the state dictionary
+            # Add the transitions to the state dictionary as string separated by commas
             for symbol, next_states in state.transitions.items():
-                result[state.name].setdefault(symbol, []).extend([transition.name for transition in next_states])
+                result[state.name][symbol] = ','.join([next_state.name for next_state in next_states])
         return result
     
-    def visualize(self):
+    @staticmethod
+    def visualize(path='nfa.json'):
         # Initialize the graph
         dot = graphviz.Digraph(comment='NFA Visualization')
         
         # Load the JSON representation of the NFA
         states_json = None
-        with open('nfa.json', 'r') as f:
+        with open(path, 'r') as f:
             states_json = json.load(f)
 
         # Pop the starting state from the JSON object
@@ -205,11 +203,12 @@ class NFA:
                 # Skip the terminating state flag
                 if symbol == 'isTerminatingState':
                     continue
+                next_states = next_states.split(',')
                 for next_state in next_states:
-                    dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
+                    dot.edge(state_name, next_state, label=symbol)
 
         # Save the graph to a file and optionally view it
-        dot.render('nfa.gv', view=True)
+        dot.render('nfa.gv', view=False)
     
 def get_main_chars(regex):
     '''
@@ -217,12 +216,13 @@ def get_main_chars(regex):
     '''
     chars_of_interest = []
     for token in regex:
-        if token not in chars_of_interest:
+        if token not in chars_of_interest and token.isalnum():
             chars_of_interest.append(token)
     return chars_of_interest
     
 if __name__ == '__main__':
     nfa = NFA(postfix='AB.AB|*.AB..')
     nfa.execute()
+    NFA.visualize()
     print("NFA generated successfully!")
     
