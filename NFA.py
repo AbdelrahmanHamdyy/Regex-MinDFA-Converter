@@ -49,7 +49,7 @@ class NFA:
                 '''
                 nfa2 = stack.pop()
                 nfa1 = stack.pop()
-                nfa1.accept.add_transition('ε', nfa2.start)
+                nfa1.accept.add_transition('epsilon', nfa2.start)
                 stack.append(NFA(nfa1.start, nfa2.accept))
             elif token == '|': # OR operator
                 '''
@@ -59,11 +59,11 @@ class NFA:
                 nfa2 = stack.pop()
                 nfa1 = stack.pop()
                 start = State(f'S{i}')
-                start.add_transition('ε', nfa1.start)
-                start.add_transition('ε', nfa2.start)
+                start.add_transition('epsilon', nfa1.start)
+                start.add_transition('epsilon', nfa2.start)
                 accept = State(f'S{i + 1}')
-                nfa1.accept.add_transition('ε', accept)
-                nfa2.accept.add_transition('ε', accept)
+                nfa1.accept.add_transition('epsilon', accept)
+                nfa2.accept.add_transition('epsilon', accept)
                 stack.append(NFA(start, accept))
             elif token == '*': # Kleene star operator
                 '''
@@ -74,10 +74,10 @@ class NFA:
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
-                start.add_transition('ε', nfa.start)
-                start.add_transition('ε', accept)
-                nfa.accept.add_transition('ε', start)
-                nfa.accept.add_transition('ε', accept)
+                start.add_transition('epsilon', nfa.start)
+                start.add_transition('epsilon', accept)
+                nfa.accept.add_transition('epsilon', start)
+                nfa.accept.add_transition('epsilon', accept)
                 stack.append(NFA(start, accept))
             elif token == '+': # One or more operator
                 '''
@@ -88,9 +88,9 @@ class NFA:
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
-                start.add_transition('ε', nfa.start)
-                nfa.accept.add_transition('ε', start)
-                nfa.accept.add_transition('ε', accept)
+                start.add_transition('epsilon', nfa.start)
+                nfa.accept.add_transition('epsilon', start)
+                nfa.accept.add_transition('epsilon', accept)
                 stack.append(NFA(start, accept))
             elif token == '?': # Zero or one operator
                 '''
@@ -101,9 +101,9 @@ class NFA:
                 nfa = stack.pop()
                 start = State(f'S{i}')
                 accept = State(f'S{i + 1}')
-                start.add_transition('ε', nfa.start)
-                start.add_transition('ε', accept)
-                nfa.accept.add_transition('ε', accept)
+                start.add_transition('epsilon', nfa.start)
+                start.add_transition('epsilon', accept)
+                nfa.accept.add_transition('epsilon', accept)
                 stack.append(NFA(start, accept))
             else: # Operand
                 '''
@@ -133,7 +133,7 @@ class NFA:
                 if state not in visited:
                     self.gather_states(NFA(start=state), visited, states)
     
-    def execute(self, path):
+    def execute(self, path='nfa.json'):
         # Build the NFA and set the starting and accepting states of the final NFA
         nfa = self.build_nfa()
         self.start = nfa.start
@@ -168,7 +168,7 @@ class NFA:
         return result
     
     @staticmethod
-    def visualize(path):
+    def visualize(path='nfa.json'):
         # Initialize the graph
         dot = graphviz.Digraph(comment='NFA Visualization')
         
@@ -203,8 +203,9 @@ class NFA:
                 # Skip the terminating state flag
                 if symbol == 'isTerminatingState':
                     continue
+                next_states = next_states.split(',')
                 for next_state in next_states:
-                    dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
+                    dot.edge(state_name, next_state, label=symbol)
 
         # Save the graph to a file and optionally view it
         dot.render('nfa.gv', view=False)
@@ -221,7 +222,7 @@ def get_main_chars(regex):
     
 if __name__ == '__main__':
     nfa = NFA(postfix='AB.AB|*.AB..')
-    nfa.execute('nfa.json')
-    NFA.visualize('nfa.json')
+    nfa.execute()
+    NFA.visualize()
     print("NFA generated successfully!")
     

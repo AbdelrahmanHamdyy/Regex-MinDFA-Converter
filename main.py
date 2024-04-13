@@ -12,8 +12,8 @@ if __name__ == '__main__':
     print(r2p)
     
     nfa = NFA(postfix=r2p.postfix)
-    nfa.execute('nfa.json')
-    NFA.visualize('nfa.json')
+    nfa.execute()
+    NFA.visualize()
     
     dfa = DFA('nfa.json', tokens)
     dfa.execute('dfa.json')
