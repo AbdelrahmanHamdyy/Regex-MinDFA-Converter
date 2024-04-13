@@ -2,8 +2,9 @@ import json
 import graphviz
 
 class DFA:
-    def __init__(self, path):
+    def __init__(self, path,regex_chars):
         self.data = self.load_data(path)
+        self.regex_chars = regex_chars
         self.result_states = None
 
     @staticmethod
@@ -131,13 +132,13 @@ class DFA:
                 dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
         dot.render('nfa.gv', view=True)
 
-    def execute(self, regex_chars, output_path):
-        terminal_states, target_chars, values_generated_from_taking_char = self.get_required_data(regex_chars)
-        self.create_dfa(terminal_states, regex_chars, values_generated_from_taking_char, target_chars)
+    def execute(self, output_path):
+        terminal_states, target_chars, values_generated_from_taking_char = self.get_required_data(self.regex_chars)
+        self.create_dfa(terminal_states, self.regex_chars, values_generated_from_taking_char, target_chars)
         self.write_data(self.result_states, output_path)
         #self.visualize_dfa(output_path)
 
 if __name__ == "__main__":
-    dfa = DFA('nu3man5.json')
-    dfa.execute(['A', 'B'], 'DFA.json')
+    dfa = DFA('nu3man5.json',['A','B'])
+    dfa.execute( 'DFA.json')
     DFA.visualize_dfa('DFA.json')
