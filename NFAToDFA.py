@@ -139,6 +139,6 @@ class DFA:
         #self.visualize_dfa(output_path)
 
 if __name__ == "__main__":
-    dfa = DFA('nu3man5.json',['A','B'])
+    dfa = DFA('nu3man6.json',['a','b'])
     dfa.execute( 'DFA.json')
     DFA.visualize_dfa('DFA.json')

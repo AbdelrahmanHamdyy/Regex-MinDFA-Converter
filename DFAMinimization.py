@@ -1,6 +1,7 @@
 import json
 import copy
 import graphviz
+import time
 
 class MinimizedDFA:
     def __init__(self,path,char_regex):
@@ -12,7 +13,6 @@ class MinimizedDFA:
             self.data = json.load(file)
 
     def initialize_groups(self):
-        print(self.data)
         non_terminating_group = []
         terminating_group = []
         groups = [non_terminating_group, terminating_group]
@@ -35,19 +35,29 @@ class MinimizedDFA:
 
     def get_groups_after_splitting(self, groups):
         is_there_a_change = True
+        #Keep looping as we have change in the groups
         while is_there_a_change:
+            #Initialize there is a change as false and if we found a change we will set it as true
             is_there_a_change = False
+            #Here we will have the array that contains the new groups of this iteration
             new_groups = []
+            print(groups)
+            #looping over all the groups existing with us, if they are with length 1 then we need not to see where they are going to
+            #As we can't split it more
             for group in groups:
                 if len(group) == 1:
+                    new_groups.append([group[0]])
                     continue
+                #Now We will take each character that may cause a transition to see how this will affect the group we are taking in consideration right now
                 for char in self.char_regex:
                     values = set()
                     for element in group:
+                        #print("Ana dlw2te bdwr fe group",group, "b letter ",char , "w mask element ",element)
                         previous_array_size = len(values)
                         value = "NotFound"
                         if char in self.data[element]:
                             value = self.get_group_of_output(groups, self.data[element][char])
+                        print(value, len(values))
                         values.add(value)
                         if len(values) > previous_array_size:
                             new_groups.append([element])
@@ -55,7 +65,7 @@ class MinimizedDFA:
                             for new_group in new_groups:
                                 for new_element in new_group:
                                     if new_element in group:
-                                        if char in self.data[element] and char in self.data[new_element]:
+                                        if char in self.data[element]:
                                             if self.get_group_of_output(groups, self.data[element][char]) == \
                                                     self.get_group_of_output(groups, self.data[new_element][char]):
                                                 new_group.append(element)
@@ -63,6 +73,8 @@ class MinimizedDFA:
                     if len(values) != 1:
                         is_there_a_change = True
                         break
+                    else:
+                        new_groups.pop(-1)
             if is_there_a_change:
                 groups = new_groups
         return groups
@@ -132,12 +144,14 @@ class MinimizedDFA:
 
     def minimize(self):
         groups = self.initialize_groups()
+        print("Groups Initialized")
         groups = self.get_groups_after_splitting(groups)
+        print("Groups Splitted")
         new_states = self.merge_nodes(groups)
         finalized_states = self.rename_nodes(new_states)
         self.write_data('minimized_DFA.json', finalized_states)
 
 if __name__ == "__main__":
-    minDfa = MinimizedDFA('DFA.json',['A','B'])
+    minDfa = MinimizedDFA('DFA.json',['a','b'])
     minDfa.minimize()
     MinimizedDFA.visualize('minimized_DFA.json')
