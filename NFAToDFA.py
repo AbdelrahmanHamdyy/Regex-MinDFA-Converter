@@ -1,203 +1,143 @@
 import json
-import time
 import graphviz
 
+class DFA:
+    def __init__(self, path):
+        self.data = self.load_data(path)
+        self.result_states = None
 
-def getAllNeededStates(data,startingState,incomingLetter,isStartState=False):
-    finalStates=[]
-    if(isStartState):
-        finalStates=[startingState]
-    if (incomingLetter in data[startingState]):
-        states = data[startingState][incomingLetter]
-        newStates = states.split(',')
-        for state in newStates:
-            finalStates.append(state)
+    @staticmethod
+    def load_data(path):
+        with open(path, 'r') as file:
+            data = json.load(file)
+        return data
 
-    result = set()
-    for state in finalStates:
-        returnedSet = getEpsilons(data, state, set())
-        if isinstance(returnedSet, str):
-            value = returnedSet
-            returnedSet = set()  # Initialize as empty set
-            returnedSet.add(value)  # Add the string value
-        result |= returnedSet  # Perform set union
-    
-    return result
-#---------------------------------------------------------------------------------------------------------------------------
-def getEpsilons(data,startingState,lettersSet):
-    resultState=lettersSet
-    if('epsilon' in data[startingState]):
-        epsilons = data[startingState]['epsilon']
-        newStates = epsilons.split(',')
-        for state in newStates:
-            if(state in resultState):
-                break
-            returnedVal = getEpsilons(data,state,resultState)
-            if isinstance(returnedVal, str):
-                resultState.add(returnedVal)
-        resultState.add(startingState)
-    else:
-        return startingState
-    return resultState
+    @staticmethod
+    def get_target_chars(regex_chars):
+        return {char: [] for char in regex_chars}
 
+    @staticmethod
+    def get_all_needed_states(data, starting_state, incoming_letter, is_start_state=False):
+        final_states = {starting_state} if is_start_state else set()
+        if incoming_letter in data[starting_state]:
+            new_states = data[starting_state][incoming_letter].split(',')
+            final_states |= set(new_states)
+        result = set()
+        for state in final_states:
+            result |= DFA.get_epsilons(data, state)
+        return result
 
+    @staticmethod
+    def get_epsilons(data, starting_state):
+        stack = [starting_state]
+        result_state = set()
+        while stack:
+            state = stack.pop()
+            if state not in result_state:
+                result_state.add(state)
+                if 'epsilon' in data[state]:
+                    epsilons = data[state]['epsilon'].split(',')
+                    stack.extend(epsilons)
+        return result_state
 
-#Dlw2te geh el dor eny amla b2a el states el muhema bensbali
-# hamla b2a 7arf 7arf mn l regex chars ely 3andy
+    def get_required_data(self, regex_chars):
+        terminal_states = {key for key, value in self.data.items() if "isTerminatingState" in value and value["isTerminatingState"]}
+        target_chars = self.get_target_chars(regex_chars)
+        values_generated_from_taking_char = {}
 
+        for char in regex_chars:
+            for key, value in self.data.items():
+                if char in value:
+                    target_chars[char].append(key)
+                    values_generated_from_taking_char[key] = self.get_all_needed_states(self.data, key, char)
 
-def createDFA(data,terminalStates,regexChars,charValues,targetChars):
-    currentStateNum =0
-    statesIncrementNum =1
-    startingState = "".join(sorted(getAllNeededStates(data,data['startingState'],'a',True)))
-    isTerminalState = False
-    for letter in startingState:
-        if letter in terminalStates:
-            isTerminalState=True
-            break
-    startingStateObject = {
-        "value": startingState,
-        "isTerminatingState": isTerminalState,
-    }
-    resultStates ={
-        "startingState": "S0",
-        "S0":startingStateObject,
-    }
+        return terminal_states, target_chars, values_generated_from_taking_char
 
-    # regexChars -> All Chars that will move us from a state to another
-    # resultStates -> contains all the states that we will add to the json in the end
-    # 
+    def create_dfa(self, terminal_states, regex_chars, char_values, target_chars):
+        current_state_num = 0
+        states_increment_num = 1
+        starting_state = sorted(self.get_all_needed_states(self.data, self.data['startingState'], '', True))
+        is_terminal_state = any(letter in terminal_states for letter in starting_state)
 
-    while(currentStateNum!=statesIncrementNum):
-        #We need to select the currentState Number to select which stated we will working on
-        #Select the current State to work on
-        currentStateIdx = 'S'+str(currentStateNum)
-        # w de el current State ely ana hshtghl 3leha dlw2ty wl mfrud en fe awl khatwa khals b3mlha access mn bara l2nha mawguda f3lan
-        currentState = resultStates[currentStateIdx]
-        #Shuf l state ely ana wa2f feha dlw2ty de htt7rk ezay lma ygelha ay char mn l possible chars ely bt7rk
-        for char in regexChars:
-            #da ely hyshel el output ely hyegy mn l char bta3 dlw2te da
-            result = set()
-            #Loop for each letter in the currentStateLetters
-            # w law fe wahd mnhum mn l chars l muhema ely bntklm 3anha fo2 fa sa3tha bus 3l map bta3tu
-            for letter in currentState["value"]:
-                if(letter in charValues and letter in targetChars[char]):
-                    result |= charValues[letter]
-            result = "".join(sorted(result))
-            isTerminalState=False
-            for letter in result:
-                if letter in terminalStates:
-                    isTerminalState=True
-                    break
-            #dlw2te ana tl3t el result ely m3aya w 3ayz ashuf hal ha3ml state gdeda wala mogrd hshawr 3la wahda mawguda 3ndy f3lan
-            referencedState = "NotFound"
-            for key,value in resultStates.items():
-                #dlw2ty hlf 3la kol el existing states ely mawguda blf3l 3ndy
-                #law l current state de mawguda yb2a mugrd ha reference
-                #law msh mawguda fa ha3ml reference we kman h create wahda gdeda
-                if "value" in value:
-                    if value["value"]==result:
-                        #w da m3nah enna l2enaha f3lan
-                        referencedState = key
-                        break
-            
-            if(referencedState == "NotFound"):
-                #yb2a kda ml2enahash
-                newStateIdx = 'S'+str(statesIncrementNum)
-                statesIncrementNum +=1
-                newStateObj = {
-                    "value":result,
-                    "isTerminatingState":isTerminalState
-                }
-                resultStates[newStateIdx] = newStateObj
-                referencedState = newStateIdx
-            currentState[char]=referencedState
-        currentStateNum+=1
-    return resultStates
+        starting_state_object = {
+            "value": starting_state,
+            "isTerminatingState": is_terminal_state,
+        }
+        result_states = {
+            "startingState": "S0",
+            "S0": starting_state_object,
+        }
 
+        while current_state_num != states_increment_num:
+            current_state_idx = 'S' + str(current_state_num)
+            current_state = result_states[current_state_idx]
 
+            for char in regex_chars:
+                result = set()
+                for letter in current_state["value"]:
+                    if letter in char_values and letter in target_chars[char]:
+                        result |= char_values[letter]
+                if not result:
+                    continue
+                result = sorted(result)
+                is_terminal_state = any(letter in terminal_states for letter in result)
 
-def writeData(resultStates,outputPath):
-    #i want to delete value from the result
-    for key,value in resultStates.items():
-        if "value" in value:
-            del value['value']
+                referenced_state = "NotFound"
+                for key, value in result_states.items():
+                    if "value" in value:
+                        if value["value"] == result:
+                            referenced_state = key
+                            break
 
-    with open(outputPath, "w") as json_file:
-        json.dump(resultStates, json_file)
+                if referenced_state == "NotFound":
+                    new_state_idx = 'S' + str(states_increment_num)
+                    states_increment_num += 1
+                    new_state_obj = {
+                        "value": result,
+                        "isTerminatingState": is_terminal_state
+                    }
+                    result_states[new_state_idx] = new_state_obj
+                    referenced_state = new_state_idx
+                current_state[char] = referenced_state
+            current_state_num += 1
+        self.result_states = result_states
 
+    @staticmethod
+    def write_data(result_states, output_path):
+        for key, value in result_states.items():
+            if "value" in value:
+                del value['value']
 
-    
-def visualizeDFA(path):
-    dot = graphviz.Digraph(comment='DFA Visualization')
-    states_json = None
-    with open(path, 'r') as f:
-        states_json = json.load(f)
+        with open(output_path, "w") as json_file:
+            json.dump(result_states, json_file)
 
-    # Handle starting state separately
-    starting_state_name = states_json.pop('startingState')
+    @staticmethod
+    def visualize_dfa(path):
+        dot = graphviz.Digraph(comment='DFA Visualization')
+        states_json = None
+        with open(path, 'r') as f:
+            states_json = json.load(f)
 
-    # Add states to the graph
-    for state_name, state_data in states_json.items():
-        shape = 'doublecircle' if state_data['isTerminatingState'] else 'circle'
-        dot.node(state_name, label=state_name, shape=shape)
+        starting_state_name = states_json.pop('startingState')
 
-    # Add starting state explicitly
-    dot.node(starting_state_name, label=starting_state_name, shape='circle')
+        for state_name, state_data in states_json.items():
+            shape = 'doublecircle' if state_data['isTerminatingState'] else 'circle'
+            dot.node(state_name, label=state_name, shape=shape)
 
-    # Add transitions
-    for state_name, transitions in states_json.items():
-        for symbol, nextState in transitions.items():
-            # Skip the terminating state flag
-            if symbol == 'isTerminatingState':
-                continue
-            dot.edge(state_name, nextState, label=symbol if symbol != '\u03b5' else 'ε')
-    dot.render('nfa.gv', view=True)
+        for state_name, transitions in states_json.items():
+            for symbol, next_state in transitions.items():
+                if symbol == 'isTerminatingState':
+                    continue
+                dot.edge(state_name, next_state, label=symbol if symbol != '\u03b5' else 'ε')
+        dot.render('nfa.gv', view=True)
 
+    def execute(self, regex_chars, output_path):
+        terminal_states, target_chars, values_generated_from_taking_char = self.get_required_data(regex_chars)
+        self.create_dfa(terminal_states, regex_chars, values_generated_from_taking_char, target_chars)
+        self.write_data(self.result_states, output_path)
+        #self.visualize_dfa(output_path)
 
-def loadData(path):
-    # Open the JSON file
-    with open(path, 'r') as file:
-        # Load the JSON data into a Python object
-        data = json.load(file)
-    return data
-
-def getTargetChars(regexChars):   
-    targetChars ={}
-    for char in regexChars:
-        targetChars[char]=[]
-
-    return targetChars
-
-def getRequiredData(data , regexChars):
-    charValues ={}
-    terminalStates=set()
-    targetChars = getTargetChars(regexChars)
-    for char in regexChars:
-        for key,value in data.items():
-            if "isTerminatingState" in value and value["isTerminatingState"]==True:
-                terminalStates.add(key)
-            if char in value:
-                targetChars[char].append(key)
-                charValues[key] = getAllNeededStates(data,key,char)
-
-    return terminalStates,targetChars,charValues
-
-def DFA():
-    data = loadData('nu3man1.json')
-    #Hena kul lchars bta3ty ely ha3uz adwr 3leha
-    #wb3den lama ag alf 3l states fa ana ha7tag en le kol state gdeda half 3l combinations bta3tha de 
-    # ely hwa mslan l state de lazm agrb alf 3l a bta3tha wl b bta3tha w ashuf htl3ly state gdeda wala la2
-    regexChars= ['a','b']
-    #Hena b2a ana 3ayz a3ml object b7es en l object da tb2a feh l letters on interest as keys w odamha array feha anhy states htb2a mohema bensbalii 3shan abos 3leha
-    #3shan a2dr a generate b2a
-    terminalStates,targetChars,charValues = getRequiredData(data,regexChars)
-    resultStates = createDFA(data,terminalStates,regexChars,charValues,targetChars)
-    writeData(resultStates,'DFA.json')
-    visualizeDFA('DFA.json')
-
-DFA()
-
-
-    
-
+if __name__ == "__main__":
+    dfa = DFA('nu3man5.json')
+    dfa.execute(['A', 'B'], 'DFA.json')
+    DFA.visualize_dfa('DFA.json')

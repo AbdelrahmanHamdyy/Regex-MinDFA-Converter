@@ -1,0 +1,42 @@
+{
+  "startingState": "A",
+  "A": {
+    "isTerminatingState": false,
+    "epsilon": "B,H"
+  },
+  "B": {
+    "isTerminatingState": false,
+    "epsilon": "C,E"
+  },
+  "C": {
+    "isTerminatingState": false,
+    "a": "D"
+  },
+  "D": {
+    "isTerminatingState": false,
+    "epsilon": "G"
+  },
+  "E": {
+    "isTerminatingState": false,
+    "b": "F"
+  },
+  "F": {
+    "isTerminatingState": false,
+    "epsilon": "G"
+  },
+  "G": {
+    "isTerminatingState": false,
+    "epsilon": "J"
+  },
+  "H": {
+    "isTerminatingState": false,
+    "epsilon": "I"
+  },
+  "I": {
+    "isTerminatingState": false,
+    "epsilon": "J"
+  },
+  "J": {
+    "isTerminatingState": true
+  }
+}
