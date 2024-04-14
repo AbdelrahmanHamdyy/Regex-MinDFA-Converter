@@ -48,7 +48,7 @@ class DFA:
 
         for char in regex_chars:
             for key, value in self.data.items():
-                if char in value:
+                if char in value and key != "startingState":
                     target_chars[char].append(key)
                     values_generated_from_taking_char[key] = self.get_all_needed_states(self.data, key, char)
 

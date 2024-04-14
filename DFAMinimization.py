@@ -6,6 +6,8 @@ import time
 class MinimizedDFA:
     def __init__(self,path,char_regex):
         self.load(path)
+        print("Ana fl minimize")
+        print(self.data)
         self.char_regex = char_regex
 
     def load(self, file_path):
@@ -44,9 +46,12 @@ class MinimizedDFA:
             print(groups)
             #looping over all the groups existing with us, if they are with length 1 then we need not to see where they are going to
             #As we can't split it more
-            for group in groups:
+            for idx,group in enumerate(groups):
+                if_there_a_change_for_this_group = False
                 if len(group) == 1:
                     new_groups.append([group[0]])
+                    continue
+                if len(group)==0:
                     continue
                 #Now We will take each character that may cause a transition to see how this will affect the group we are taking in consideration right now
                 for char in self.char_regex:
@@ -57,7 +62,6 @@ class MinimizedDFA:
                         value = "NotFound"
                         if char in self.data[element]:
                             value = self.get_group_of_output(groups, self.data[element][char])
-                        print(value, len(values))
                         values.add(value)
                         if len(values) > previous_array_size:
                             new_groups.append([element])
@@ -65,7 +69,7 @@ class MinimizedDFA:
                             for new_group in new_groups:
                                 for new_element in new_group:
                                     if new_element in group:
-                                        if char in self.data[element]:
+                                        if char in self.data[element] and char in self.data[new_element]:
                                             if self.get_group_of_output(groups, self.data[element][char]) == \
                                                     self.get_group_of_output(groups, self.data[new_element][char]):
                                                 new_group.append(element)
@@ -75,11 +79,14 @@ class MinimizedDFA:
                         break
                     else:
                         new_groups.pop(-1)
-            if is_there_a_change:
-                groups = new_groups
+                if(not is_there_a_change):
+                    new_groups.append(groups[idx])
+            groups = new_groups
         return groups
 
     def merge_nodes(self, groups):
+        print(groups)
+        print("From Merge")
         new_states = copy.copy(self.data)
         for group in groups:
             if len(group) > 1:
@@ -90,7 +97,7 @@ class MinimizedDFA:
                         continue
                     if "isTerminatingState" in value:
                         for char in value:
-                            if char in self.char_regex:
+                            if char in self.char_regex and key in new_states:
                                 if new_states[key][char] in group:
                                     new_states[key][char] = name_of_the_group
         return new_states
@@ -144,12 +151,11 @@ class MinimizedDFA:
 
     def minimize(self):
         groups = self.initialize_groups()
-        print("Groups Initialized")
         groups = self.get_groups_after_splitting(groups)
-        print("Groups Splitted")
         new_states = self.merge_nodes(groups)
         finalized_states = self.rename_nodes(new_states)
         self.write_data('output/minimized_DFA.json', finalized_states)
+        print("Minimized Successfully")
 
 if __name__ == "__main__":
     minDfa = MinimizedDFA('output/dfa.json',['a','b'])
