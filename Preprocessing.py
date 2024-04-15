@@ -46,7 +46,7 @@ class RegexToPostfix:
                 # Keep adding characters to the new regex until we encounter a closing square bracket or reach the end of the regex
                 while regex[i] != ']' and i + 1 < len(regex):
                     # If the current character and the next character are both alphanumeric, insert a | between them
-                    if (regex[i].isalnum() and regex[i + 1].isalnum()): # or (regex[i] in '*+.)?' and regex[i + 1].isalnum()):
+                    if (regex[i].isalnum() and regex[i + 1].isalnum()) or (regex[i] in '*+.)?' and regex[i + 1].isalnum()):
                         new_regex += regex[i] + '|'
                     else: # Otherwise, just add the character to the new regex
                         new_regex += regex[i]
