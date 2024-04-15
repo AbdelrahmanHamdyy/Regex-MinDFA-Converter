@@ -2,9 +2,11 @@ from Preprocessing import RegexToPostfix
 from NFA import NFA, get_main_chars
 from NFAToDFA import DFA
 from DFAMinimization import MinimizedDFA
-strings =['(a*?)*','(a*)*','(a*b)(b?a+)','(a*b*)([a-b]*)','(a+?a+?)+?b','(a+a+)+b','(a|b)*a[ab]?','[a-c]*','[A-Ea-c]+1|2[0-9]*K?[ABC](ABC)','Aym[o+o+]na?']
+
+test_cases = ['(a*?)*','(a*)*','(a*b)(b?a+)','(a*b*)([a-b]*)','(a+?a+?)+?b','(a+a+)+b','(a|b)*a[ab]?','[a-c]*','[A-Ea-c]+1|2[0-9]*K?[ABC](ABC)','Aym[o+o+]na?']
+
 if __name__ == '__main__':
-    regex = strings[9]
+    regex = test_cases[9]
     
     r2p = RegexToPostfix(regex)
     print(r2p)
@@ -18,7 +20,7 @@ if __name__ == '__main__':
     
     dfa = DFA('output/nfa.json', tokens)
     dfa.execute('output/dfa.json')
-    #DFA.visualize_dfa('output/dfa.json')
+    DFA.visualize_dfa('output/dfa.json')
     
     minimized_dfa = MinimizedDFA('output/dfa.json', tokens)
     minimized_dfa.minimize()
