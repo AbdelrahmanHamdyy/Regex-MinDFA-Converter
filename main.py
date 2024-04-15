@@ -4,7 +4,7 @@ from NFAToDFA import DFA
 from DFAMinimization import MinimizedDFA
 strings =['(a*?)*','(a*)*','(a*b)(b?a+)','(a*b*)([a-b]*)','(a+?a+?)+?b','(a+a+)+b','(a|b)*a[ab]?','[ABC]*','[A-Ea-c]+1|2[0-9]*K?[ABC](ABC)','Aym[o+o+]na?','[a-c0-2]32']
 if __name__ == '__main__':
-    regex = strings
+    regex = strings[1]
     
     r2p = RegexToPostfix(regex)
     print(r2p)
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     
     dfa = DFA('output/nfa.json', tokens)
     dfa.execute('output/dfa.json')
-    #DFA.visualize_dfa('output/dfa.json')
+    DFA.visualize_dfa('output/dfa.json')
     
     minimized_dfa = MinimizedDFA('output/dfa.json', tokens)
     minimized_dfa.minimize()

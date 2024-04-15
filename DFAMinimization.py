@@ -60,7 +60,6 @@ class MinimizedDFA:
                     #fa ha7ut ll 7rf da set w law l size bta3 l set de zad 3an el 1 fa ma3na kda en fe kaza element byru7u l hagat mu5tlfa
                     values = set()
                     for element in group:
-    
                         #print("Ana dlw2te bdwr fe group",group, "best5dam letter ",char , "w mask element ",element,"wl values heya ",values)
                         #esmk b2a l group ely ehna feh da w lef 3ala element element gwah
                         #print("Ana dlw2te bdwr fe group",group, "best5dam letter ",char , "w mask element ",element)
