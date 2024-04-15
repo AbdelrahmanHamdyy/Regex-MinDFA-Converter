@@ -2,9 +2,9 @@ from Preprocessing import RegexToPostfix
 from NFA import NFA, get_main_chars
 from NFAToDFA import DFA
 from DFAMinimization import MinimizedDFA
-strings =['(a*?)*','(a*)*','(a*b)(b?a+)','(a*b*)([a-b]*)','(a+?a+?)+?b','(a+a+)+b','(a|b)*a[ab]?','[a-c]*','[A-Ea-c]+1|2[0-9]*K?[ABC](ABC)','Aym[o+o+]na?']
+strings =['(a*?)*','(a*)*','(a*b)(b?a+)','(a*b*)([a-b]*)','(a+?a+?)+?b','(a+a+)+b','(a|b)*a[ab]?','[ABC]*','[A-Ea-c]+1|2[0-9]*K?[ABC](ABC)','Aym[o+o+]na?','[a-c0-2]32']
 if __name__ == '__main__':
-    regex = strings[9]
+    regex = strings
     
     r2p = RegexToPostfix(regex)
     print(r2p)
