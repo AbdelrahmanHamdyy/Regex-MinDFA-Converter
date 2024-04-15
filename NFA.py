@@ -41,7 +41,16 @@ class NFA:
         stack = []
         # Counter to keep track of the state names
         i = 0
-        for token in self.postfix:
+        # Loop counter
+        j = 0
+        while j < len(self.postfix):
+            token = ''
+            if j + 2 < len(self.postfix) and self.postfix[j].isalnum() and self.postfix[j + 1] == '-' and self.postfix[j + 2].isalnum():
+                token = self.postfix[j] + self.postfix[j + 1] + self.postfix[j + 2]
+                j += 3
+            else:
+                token = self.postfix[j]
+                j += 1
             if token == '.': # Concatenation operator
                 '''
                 - Pop two NFAs from the stack, connect the accept state of the first NFA to the start state of the second NFA which accounts for the concatenation of the two NFAs
@@ -215,13 +224,21 @@ def get_main_chars(regex):
     Get the main characters of interest in the regular expression that would form new states
     '''
     chars_of_interest = []
-    for token in regex:
-        if token not in chars_of_interest and token.isalnum():
+    i = 0
+    while i < len(regex):
+        token = ''
+        if i + 2 < len(regex) and regex[i].isalnum() and regex[i + 1] == '-' and regex[i + 2].isalnum():
+            token = regex[i] + regex[i + 1] + regex[i + 2]
+            i += 3
+        else:
+            token = regex[i]
+            i += 1
+        if token not in chars_of_interest and (token.isalnum() or '-' in token):
             chars_of_interest.append(token)
     return chars_of_interest
     
 if __name__ == '__main__':
-    nfa = NFA(postfix='AB.AB|*.AB..')
+    nfa = NFA(postfix='a*b.c.a-zA-Z|b|d|.r?.')
     nfa.execute()
     NFA.visualize()
     print("NFA generated successfully!")

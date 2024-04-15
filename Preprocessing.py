@@ -46,7 +46,7 @@ class RegexToPostfix:
                 # Keep adding characters to the new regex until we encounter a closing square bracket or reach the end of the regex
                 while regex[i] != ']' and i + 1 < len(regex):
                     # If the current character and the next character are both alphanumeric, insert a | between them
-                    if regex[i].isalnum() and regex[i + 1].isalnum():
+                    if (regex[i].isalnum() and regex[i + 1].isalnum()): # or (regex[i] in '*+.)?' and regex[i + 1].isalnum()):
                         new_regex += regex[i] + '|'
                     else: # Otherwise, just add the character to the new regex
                         new_regex += regex[i]
@@ -61,7 +61,7 @@ class RegexToPostfix:
             i += 1
         
         return new_regex
-                    
+    
     def replace_hyphens(self, regex):
         '''
         Replace hyphens with a range of characters
@@ -114,8 +114,8 @@ class RegexToPostfix:
         regex = self.remove_spaces(self.regex)
         print("After removing spaces:", regex)
         
-        regex = self.replace_hyphens(regex)
-        print("After substituting hyphens:", regex)
+        # regex = self.replace_hyphens(regex)
+        # print("After substituting hyphens:", regex)
         
         regex = self.convert_square_brackets(regex)
         print("After converting square brackets:", regex)
@@ -174,6 +174,6 @@ class RegexToPostfix:
         return f"Regex: {self.regex}\nPostfix: {self.postfix}" if self.valid else f"Invalid regex: {self.regex}"
     
 if __name__ == '__main__':
-    regex = '[abc][a-z]ab*c'
+    regex = 'a*bc[a-zA-Zbd]r?'
     R2P = RegexToPostfix(regex)
     print(R2P)
