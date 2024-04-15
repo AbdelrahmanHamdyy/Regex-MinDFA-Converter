@@ -119,9 +119,22 @@ class DFA:
         with open(path, 'r') as f:
             states_json = json.load(f)
 
-        starting_state_name = states_json.pop('startingState')
+        # Pop the starting state from the JSON object
+        start_state_name = states_json.pop('startingState')
+        
+        # Add a starting point to the graph
+        dot.node('', label='', shape='point')
+        
+        # Explicitly add the starting state to the graph
+        shape = 'doublecircle' if states_json[start_state_name]['isTerminatingState'] else 'circle'
+        dot.node(start_state_name, label=start_state_name, shape=shape)
+        
+        # Connect the starting point to the starting state
+        dot.edge('', start_state_name)
 
         for state_name, state_data in states_json.items():
+            if state_name == start_state_name:
+                continue
             shape = 'doublecircle' if state_data['isTerminatingState'] else 'circle'
             dot.node(state_name, label=state_name, shape=shape)
 
