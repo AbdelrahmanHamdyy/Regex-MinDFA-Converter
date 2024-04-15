@@ -236,10 +236,3 @@ def get_main_chars(regex):
         if token not in chars_of_interest and (token.isalnum() or '-' in token or token == '.'):
             chars_of_interest.append(token)
     return chars_of_interest
-    
-if __name__ == '__main__':
-    nfa = NFA(postfix='a*b.c.a-zA-Z|b|d|.r?.')
-    nfa.execute()
-    NFA.visualize()
-    print("NFA generated successfully!")
-    

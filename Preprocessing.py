@@ -172,8 +172,3 @@ class RegexToPostfix:
     
     def __str__(self) -> str:
         return f"Regex: {self.regex}\nPostfix: {self.postfix}" if self.valid else f"Invalid regex: {self.regex}"
-    
-if __name__ == '__main__':
-    regex = 'a*bc[a-zA-Zbd]r?'
-    R2P = RegexToPostfix(regex)
-    print(R2P)

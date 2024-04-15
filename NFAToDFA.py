@@ -149,8 +149,3 @@ class DFA:
         terminal_states, target_chars, values_generated_from_taking_char = self.get_required_data(self.regex_chars)
         self.create_dfa(terminal_states, self.regex_chars, values_generated_from_taking_char, target_chars)
         self.write_data(self.result_states, output_path)
-
-if __name__ == "__main__":
-    dfa = DFA('nu3man6.json',['a','b'])
-    dfa.execute( 'DFA.json')
-    DFA.visualize_dfa('DFA.json')
