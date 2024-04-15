@@ -170,7 +170,7 @@ class MinimizedDFA:
         dot.node(start_state_name, label=start_state_name, shape=shape)
         
         # Connect the starting point to the starting state
-        dot.edge('', start_state_name)
+        dot.edge('', start_state_name, label="start")
 
         for state_name, state_data in states_json.items():
             if state_name == start_state_name:

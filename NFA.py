@@ -197,7 +197,7 @@ class NFA:
         dot.node(start_state_name, label=start_state_name, shape=shape)
         
         # Connect the starting point to the starting state
-        dot.edge('', start_state_name)
+        dot.edge('', start_state_name, label="start")
 
         # Add states to the graph
         for state_name, state_data in states_json.items():
