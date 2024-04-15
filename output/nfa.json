@@ -2,7 +2,7 @@
     "startingState": "S0",
     "S0": {
         "isTerminatingState": false,
-        "K": "S1"
+        "A": "S1"
     },
     "S1": {
         "isTerminatingState": false,
@@ -10,15 +10,11 @@
     },
     "S2": {
         "isTerminatingState": false,
-        "a": "S3"
+        "y": "S3"
     },
     "S3": {
         "isTerminatingState": false,
-        "epsilon": "S6"
-    },
-    "S6": {
-        "isTerminatingState": false,
-        "epsilon": "S4,S7"
+        "epsilon": "S4"
     },
     "S4": {
         "isTerminatingState": false,
@@ -26,19 +22,23 @@
     },
     "S5": {
         "isTerminatingState": false,
-        "epsilon": "S6,S7"
-    },
-    "S7": {
-        "isTerminatingState": false,
         "epsilon": "S14"
     },
     "S14": {
         "isTerminatingState": false,
-        "epsilon": "S8,S10"
+        "epsilon": "S8,S12"
     },
     "S8": {
         "isTerminatingState": false,
-        "o": "S9"
+        "epsilon": "S6"
+    },
+    "S6": {
+        "isTerminatingState": false,
+        "o": "S7"
+    },
+    "S7": {
+        "isTerminatingState": false,
+        "epsilon": "S8,S9"
     },
     "S9": {
         "isTerminatingState": false,
@@ -50,18 +50,30 @@
     },
     "S16": {
         "isTerminatingState": false,
-        "l": "S17"
+        "n": "S17"
     },
     "S17": {
         "isTerminatingState": false,
-        "epsilon": "S18"
+        "epsilon": "S20"
+    },
+    "S20": {
+        "isTerminatingState": false,
+        "epsilon": "S18,S21"
     },
     "S18": {
         "isTerminatingState": false,
         "a": "S19"
     },
     "S19": {
+        "isTerminatingState": false,
+        "epsilon": "S21"
+    },
+    "S21": {
         "isTerminatingState": true
+    },
+    "S12": {
+        "isTerminatingState": false,
+        "epsilon": "S10"
     },
     "S10": {
         "isTerminatingState": false,
@@ -69,11 +81,7 @@
     },
     "S11": {
         "isTerminatingState": false,
-        "epsilon": "S12"
-    },
-    "S12": {
-        "isTerminatingState": false,
-        "u": "S13"
+        "epsilon": "S12,S13"
     },
     "S13": {
         "isTerminatingState": false,
