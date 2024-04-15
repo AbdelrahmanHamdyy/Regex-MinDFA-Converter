@@ -7,7 +7,7 @@ class RegexToPostfix:
         # Validate the regex before proceeding with the conversion
         self.valid = self.validate_regex()
         # Precedence of operators to be used in the shunting yard algorithm
-        self.operator_precedence = {'*': 5, '+': 4, '?': 3, '.': 2, '|': 1}
+        self.operator_precedence = {'*': 5, '+': 4, '?': 3, '#': 2, '|': 1}
         # Convert infix to postfix
         self.postfix = self.infix_to_postfix()
         
@@ -101,8 +101,8 @@ class RegexToPostfix:
         for i in range(len(regex)):
             # If the current character is alphanumeric or an opening parenthesis and the previous character is alphanumeric or a closing parenthesis directly after each other, insert a concatenation symbol between them
             # Or if the current character is not a special character and the previous character is a special character, insert a .
-            if i > 0 and (((regex[i].isalnum() or regex[i] == '(') and (regex[i - 1].isalnum() or regex[i - 1] == ')')) or (regex[i] not in '*+.|)?' and regex[i - 1] in '*+)?')):
-                result += '.'
+            if i > 0 and (((regex[i].isalnum() or regex[i] == '(' or regex[i] == '.') and (regex[i - 1].isalnum() or regex[i - 1] == ')' or regex[i - 1] == '.')) or (regex[i] not in '*+|)?' and regex[i - 1] in '*+)?')):
+                result += '#'
             # Add the current character to the new regex
             result += regex[i]
         return result

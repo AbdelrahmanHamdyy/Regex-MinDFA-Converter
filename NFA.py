@@ -51,7 +51,7 @@ class NFA:
             else:
                 token = self.postfix[j]
                 j += 1
-            if token == '.': # Concatenation operator
+            if token == '#': # Concatenation operator
                 '''
                 - Pop two NFAs from the stack, connect the accept state of the first NFA to the start state of the second NFA which accounts for the concatenation of the two NFAs
                 - Push the new NFA back to the stack
@@ -124,7 +124,7 @@ class NFA:
                 stack.append(NFA(start, accept))
         
             # Increment the counter by 2 if the token is not a concatenation operator since it doesn't consume a state name
-            i += 2 if token != '.' else 0
+            i += 2 if token != '#' else 0
             
         return stack.pop()
     
@@ -233,7 +233,7 @@ def get_main_chars(regex):
         else:
             token = regex[i]
             i += 1
-        if token not in chars_of_interest and (token.isalnum() or '-' in token):
+        if token not in chars_of_interest and (token.isalnum() or '-' in token or token == '.'):
             chars_of_interest.append(token)
     return chars_of_interest
     
